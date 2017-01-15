@@ -1,8 +1,9 @@
 <?php
 
-namespace Bagf\Grammar;
+namespace Bagf\Dynamic\Grammar;
 
 interface CanDefineAnonClass extends CanDefineClass
 {
-    // @TODO
+    public function setAnonymous();
+    public function setDefined($name);
 }
