@@ -193,4 +193,10 @@ class Builder
     {
         return str_replace("\n", '', var_export($var, true));
     }
+    
+    public function __call($method, $parameters)
+    {
+        call_user_func_array([$this->grammar, $method], $parameters);
+        return $this;
+    }
 }
