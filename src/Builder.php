@@ -149,7 +149,36 @@ class Builder
     
     public function instance()
     {
-        // @TODO
+        $code = $this->grammar->defineClass();
+        
+        eval($code);
+        
+        if (is_null($this->grammar->getName()) && isset($newClass)) {
+            $reflect = new ReflectionObject($newClass);
+            foreach ($this->restore['property'] as $name => $value) {
+                $p = $reflect->getProperty($name);
+                if (!$p->isPublic()) {
+                    $p->setAccessible(true);
+                    $p->setValue($newClass, $value);
+                    $p->setAccessible(false);
+                } else {
+                    $p->setValue($newClass, $value);
+                }
+            }
+            
+            foreach ($this->restore['static'] as $name => $value) {
+                $p = $reflect->getProperty($name);
+                if (!$p->isPublic()) {
+                    $p->setAccessible(true);
+                    $p->setValue(null, $value);
+                    $p->setAccessible(false);
+                } else {
+                    $p->setValue(null, $value);
+                }
+            }
+            
+            return $newClass;
+        }
     }
     
     protected static function extractCode($file, $start, $end)

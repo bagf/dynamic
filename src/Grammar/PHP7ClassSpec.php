@@ -104,8 +104,11 @@ class PHP7ClassSpec implements CanDefineAnonClass
             } else {
                 $return = ': '.$return->__toString();
             }
+        } else {
+            $return = '';
         }
-        $this->methods[$name]['method'] = "{$access}".($isStatic?' static':'')." {$name}";
+        $this->methods[$name]['params'] = [];
+        $this->methods[$name]['method'] = "{$access}".($isStatic?' static':'')." function {$name}";
         $this->methods[$name]['return'] = "{$return}";
         $this->methods[$name]['func'] = "\n{$function}";
     }
@@ -135,9 +138,6 @@ class PHP7ClassSpec implements CanDefineAnonClass
         }
         
         if (isset($this->methods[$method])) {
-            if (!isset($this->methods[$method]['params'])) {
-                $this->methods[$method]['params'] = [];
-            }
             $this->methods[$method]['params'][] = $params;
         }
     }
@@ -146,9 +146,54 @@ class PHP7ClassSpec implements CanDefineAnonClass
     {
         $this->traits[$trait] = "use {$trait};";
     }
+    
+    protected function defineAnonClass()
+    {
+        // Clear construct as it cannot be eval'ed at this point
+        if (isset($this->methods['__construct'])) {
+            unset($this->methods['__construct']);
+        }
+        
+        return "\$newClass = new class()";
+    }
 
     public function defineClass()
     {
+        if (is_null($this->name)) {
+            $class = $this->defineAnonClass();
+        } else {
+            $class = "class {$this->name}";
+        }
         
+        if (!is_null($this->extend)) {
+            $class .= " extends {$this->extend}";
+        }
+        
+        if (count($this->interfaces) > 0) {
+            $class .= " implements ".implode(', ', $this->interfaces);
+        }
+        
+        $code = "{$class}\n{\n";
+        
+        $code .= implode("\n", $this->constants);
+        $code .= "\n";
+        
+        $code .= implode("\n", $this->properties);
+        $code .= "\n";
+        
+        $code .= implode("\n", $this->traits);
+        $code .= "\n";
+        
+        foreach ($this->methods as $m) {
+            $code .= "{$m['method']}(".implode(", ", $m['params'])."){$m['return']}";
+            $code .= $m['func'];
+            $code .= "\n";
+        }
+        
+        if (is_null($this->name)) {
+            return "{$code}\n};\n";
+        }
+        
+        return "{$code}\n}\n";
     }
 }
