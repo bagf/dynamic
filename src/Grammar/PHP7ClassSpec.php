@@ -32,6 +32,11 @@ class PHP7ClassSpec implements CanDefineAnonClass
     public function implement($interface)
     {
         if (!in_array($interface, $this->interfaces)) {
+            foreach ($this->interfaces as $i => $iface) {
+                if (is_subclass_of($iface, $interface)) {
+                    return ;
+                }
+            }
             $this->interfaces[] = $interface;
         }
     }
