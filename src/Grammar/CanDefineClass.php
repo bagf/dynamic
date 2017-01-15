@@ -16,6 +16,7 @@ interface CanDefineClass
     public function privateProperty($name, $isStatic = false);
     public function methodParameter($method, $name, $type, $default = '#nodefault#');
     public function implement($interface);
+    public function shareTrait($trait);
     public function extend($class);
     public function defineClass();
     public function getName();

@@ -12,6 +12,7 @@ class PHP7ClassSpec implements CanDefineAnonClass
     protected $name = null;
     protected $extend = null;
     protected $interfaces = [];
+    protected $traits = [];
 
     public function extend($class)
     {
@@ -111,7 +112,7 @@ class PHP7ClassSpec implements CanDefineAnonClass
     
     protected function property($access, $name, $isStatic)
     {
-        $this->properties[$name] = "{$access}".($isStatic?' static':'')." \${$name}";
+        $this->properties[$name] = "{$access}".($isStatic?' static':'')." \${$name};";
     }
 
     public function methodParameter($method, $name, $type, $default = '#nodefault#')
@@ -134,6 +135,11 @@ class PHP7ClassSpec implements CanDefineAnonClass
             }
             $this->methods[$method]['params'][] = $params;
         }
+    }
+    
+    public function shareTrait($trait)
+    {
+        $this->traits[$trait] = "use {$trait};";
     }
 
     public function defineClass()

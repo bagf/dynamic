@@ -58,6 +58,10 @@ class Builder
             $grammar->implement($interface->getName());
         }
         
+        foreach ($reflect->getTraits() as $trait) {
+            $grammar->shareTrait($trait->getName());
+        }
+        
         foreach ($reflect->getConstants() as $constant => $value) {
             $grammar->publicConstant($constant, static::exportVarLine($value));
         }
